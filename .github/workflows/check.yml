@@ -28,7 +28,7 @@ jobs:
         with:
           extra_nix_config: |
             allow-import-from-derivation = false
-            extra-experimental-features = ca-derivations dynamic-derivations recursive-nix
+            experimental-features = ca-derivations dynamic-derivations flakes nix-command recursive-nix
 
       - name: Set up cachix
         uses: cachix/cachix-action@v16
