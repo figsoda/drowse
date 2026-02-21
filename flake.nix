@@ -45,5 +45,12 @@
         };
 
       transposition.lib.adHoc = true;
+
+      flake.templates = {
+        crate2nix = {
+          path = ./templates/crate2nix;
+          description = "A Cargo package with drowse and crate2nix";
+        };
+      };
     };
 }
