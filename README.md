@@ -4,7 +4,7 @@ A thin wrapper around dynamic derivations to make it easier to use
 
 ## Why
 
-Tools like [crate2nix] allows for the fine-grain caching of dependencies.
+Tools like [crate2nix] allow for the fine-grain caching of dependencies.
 However they rely on either import-from-derivation (IFD),
 which nukes the evaluation time by sequentializing the process,
 or code generation, which clutters git history, and still might have negative
