@@ -37,7 +37,7 @@ lib.fix (self: {
     pname = "hello";
     version = "2.12.2";
     src = ./hello.nix;
-    args = ''
+    args = /* nix */ ''
       { withGit = true; }
     '';
   };
@@ -50,9 +50,34 @@ lib.fix (self: {
     pname = "hello-rs";
     version = "0.1.0";
     src = ./hello-rs;
+    dynamicCargoDeps = false;
   };
   crate2nixVersion = testers.testVersion {
     package = self.crate2nix;
+  };
+
+  crate2nixArgs = drowse.crate2nix {
+    pname = "hello-rs";
+    version = "0.1.0";
+    src = ./hello-rs;
+    args.rootFeatures = [ "fancy" ];
+  };
+  crate2nixArgsVersion = testers.testVersion {
+    package = self.crate2nixArgs;
+    version = "9.9.9+fancy";
+  };
+
+  crate2nixArgsString = drowse.crate2nix {
+    pname = "hello-rs";
+    version = "0.1.0";
+    src = ./hello-rs;
+    args = /* nix */ ''
+      { rootFeatures = [ "fancy" ]; }
+    '';
+  };
+  crate2nixArgsStringVersion = testers.testVersion {
+    package = self.crate2nixArgsString;
+    version = "9.9.9+fancy";
   };
 
   crate2nixDynamic = drowse.crate2nix {
@@ -68,6 +93,22 @@ lib.fix (self: {
     assertion = "crate2nix and crate2nixDynamic are equivalent";
     expected = self.crate2nix;
     actual = self.crate2nixDynamic;
+  };
+
+  crate2nixSelect = drowse.crate2nix {
+    pname = "hello-rs";
+    version = "0.1.0";
+    src = ./hello-rs;
+    select = /* nix */ ''
+      project:
+      project.rootCrate.build.override {
+        features = [ "fancy" ];
+      }
+    '';
+  };
+  crate2nixSelectVersion = testers.testVersion {
+    package = self.crate2nixSelect;
+    version = "9.9.9+fancy";
   };
 
   crate2nixRemote = drowse.crate2nix (finalAttrs: {
