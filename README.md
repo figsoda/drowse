@@ -7,22 +7,21 @@ A thin wrapper around dynamic derivations to make it easier to use
 Tools like [crate2nix] allow for the fine-grain caching of dependencies.
 However they rely on either import-from-derivation (IFD),
 which nukes the evaluation time by sequentializing the process,
-or code generation, which clutters git history, and still might have negative
+or code generation, which clutters git history, and still might have a negative
 impact on evaluation time due to how big some generated files are.
 
 Dynamic derivations is an experimental feature of Nix that allows you to
 get the best of both worlds: fine-grained caching without IFD or code generation.
 Drowse aims to reduce the boilerplate that dynamic derivations require,
-and integrates with tools like [crate2nix] to provide a mkDerivation-like experience.
+and integrates with tools like [crate2nix] to provide a `mkDerivation`-like experience.
 
 ## Usage
 
 The following experimental features need to be enabled:
 `ca-derivations`, `dynamic-derivations`, `recursive-nix`.
 
-The easiest way to use drowse is as a flake
-
 ```nix
+# flake.nix
 {
   inputs.drowse.url = "github:figsoda/drowse";
 }
@@ -33,7 +32,7 @@ You can also import the same functions from [default.nix](default.nix) without f
 
 ### callPackage
 
-Type (finalAttrs-compatible):
+Type (`finalAttrs`-compatible):
 
 ```nix
 {
@@ -45,7 +44,7 @@ Type (finalAttrs-compatible):
 
 Roughly equivalent to `pkgs.callPackage src args`,
 but contents of `src` are only evaluated at build time.
-It is also recommended to a specify `name`, or `pname` and `version`,
+It is also recommended to specify a `name`, or `pname` and `version`,
 that is the same as the ones provided in `src`.
 
 ```nix
@@ -81,7 +80,7 @@ You can create a Rust project with drowse and [crate2nix] with the provided temp
 nix flake init -t github:figsoda/drowse#crate2nix
 ```
 
-Type (finalAttrs-compatible):
+Type (`finalAttrs`-compatible):
 
 ```nix
 {
