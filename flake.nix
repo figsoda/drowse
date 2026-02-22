@@ -29,14 +29,9 @@
           ...
         }:
         {
-          lib = haumea.lib.load {
-            src = ./src;
-            inputs = removeAttrs pkgs [
-              "root"
-              "self"
-              "super"
-            ];
-            loader = haumea.lib.loaders.callPackage;
+          lib = import ./. {
+            inherit pkgs;
+            haumea = haumea.lib;
           };
           checks = import ./tests {
             inherit lib pkgs;
