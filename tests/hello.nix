@@ -1,6 +1,9 @@
 {
+  lib,
   stdenv,
   fetchurl,
+  withGit ? false,
+  git,
 }:
 
 stdenv.mkDerivation (finalAttrs: {
@@ -13,4 +16,8 @@ stdenv.mkDerivation (finalAttrs: {
   };
 
   doCheck = true;
+
+  postInstall = lib.optionalString withGit ''
+    ln -sf "${lib.getExe git}" "$out/bin/hello"
+  '';
 })

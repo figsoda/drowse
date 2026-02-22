@@ -7,6 +7,7 @@
 let
   inherit (pkgs)
     fetchFromGitHub
+    git
     testers
     ;
 in
@@ -19,6 +20,30 @@ lib.fix (self: {
   };
   callPackageVersion = testers.testVersion {
     package = self.callPackage;
+  };
+
+  callPackageArgs = drowse.callPackage {
+    pname = "hello";
+    version = "2.12.2";
+    src = ./hello.nix;
+    args.withGit = true;
+  };
+  callPackageArgsVersion = testers.testVersion {
+    package = self.callPackageArgs;
+    inherit (git) version;
+  };
+
+  callPackageArgsString = drowse.callPackage {
+    pname = "hello";
+    version = "2.12.2";
+    src = ./hello.nix;
+    args = ''
+      { withGit = true; }
+    '';
+  };
+  callPackageArgsStringVersion = testers.testVersion {
+    package = self.callPackageArgsString;
+    inherit (git) version;
   };
 
   crate2nix = drowse.crate2nix {
