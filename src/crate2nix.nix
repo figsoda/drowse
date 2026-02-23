@@ -2,14 +2,13 @@
   super,
   lib,
   crate2nix,
-  nix,
   path,
   rustPlatform,
   writeText,
 }:
 
 lib.extendMkDerivation {
-  constructDrv = super.mkDynamicDerivation;
+  constructDrv = super.instantiate;
 
   excludeDrvArgNames = [
     "args"
@@ -23,6 +22,10 @@ lib.extendMkDerivation {
       args ? { },
       dynamicCargoDeps ? true,
       select ? "project: project.rootCrate.build",
+      passAsFile ? [ ],
+      nativeBuildInputs ? [ ],
+      preBuild ? "",
+      env ? { },
       ...
     }:
     let
@@ -45,19 +48,19 @@ lib.extendMkDerivation {
             lockFile = finalAttrs.src + "/Cargo.lock";
           };
 
-      nativeBuildInputs = [
+      nativeBuildInputs = nativeBuildInputs ++ [
         crate2nix
-        nix
         rustPlatform.cargoSetupHook
       ];
 
-      passAsFile = [
+      passAsFile = passAsFile ++ [
         "crate2nixArgs"
-        "crate2nixExpr"
         "crate2nixSelect"
       ];
       crate2nixArgs = args'.value;
-      crate2nixExpr = /* nix */ ''
+      crate2nixSelect = select;
+
+      expr = /* nix */ ''
         let
           args = ${args'.load};
           project = import ./Cargo.nix args;
@@ -68,23 +71,15 @@ lib.extendMkDerivation {
           name = "${finalAttrs.passthru.outName}";
         }
       '';
-      crate2nixSelect = select;
 
       env = {
         NIX_PATH = "nixpkgs=${path}";
-      };
+      }
+      // env;
 
-      buildPhase = ''
-        runHook preBuild
+      preBuild = ''
+        ${preBuild}
         crate2nix generate
-        drv=$(nix-instantiate - < "$crate2nixExprPath")
-        runHook postBuild
-      '';
-
-      installPhase = ''
-        runHook preInstall
-        install -Dm444 "$drv" "$out"
-        runHook postInstall
       '';
     };
 }

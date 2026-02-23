@@ -111,6 +111,32 @@ drowse.crate2nix {
 };
 ```
 
+### instantiate
+
+Type (`finalAttrs`-compatible):
+
+```nix
+{ expr, ... } -> derivation
+```
+
+Build the derivation created by `nix-instantiate --expr <expr>`,
+like a lazy `import` that happens only at build time.
+
+```nix
+drowse.instantiate (finalAttrs: {
+  pname = "nix-init";
+  version = "0.3.3";
+  expr = ''
+    (import <nixpkgs> { }).nix-init.overrideAttrs {
+      pname = "${finalAttrs.pname}";
+      version = "${finalAttrs.version}";
+    }
+  '';
+  env.NIX_PATH = "nixpkgs=${path}";
+  dontUnpack = true;
+})
+```
+
 ### mkDynamicDerivation
 
 A lower level wrapper around the regular `mkDerivation` for building dynamic derivations
