@@ -1,37 +1,38 @@
 {
   super,
   lib,
-  nix,
   path,
 }:
 
 lib.extendMkDerivation {
-  constructDrv = super.mkDynamicDerivation;
+  constructDrv = super.instantiate;
 
-  excludeDrvArgNames = [ "args" ];
+  excludeDrvArgNames = [
+    "args"
+    "src"
+  ];
 
   extendDrvArgs =
     finalAttrs:
     {
       src,
       args ? { },
+      passAsFile ? [ ],
+      env ? { },
       ...
     }:
     let
       args' = super.mkArgs "callPackageArgs" args;
     in
     {
-      nativeBuildInputs = [ nix ];
-
-      passAsFile = [
-        "callPackageArgs"
-        "callPackageExpr"
-      ];
+      passAsFile = passAsFile ++ [ "callPackageArgs" ];
+      callPackageSrc = src;
       callPackageArgs = args'.value;
-      callPackageExpr = /* nix */ ''
+
+      instantiateExpr = /* nix */ ''
         let
           args = ${args'.load};
-          drv = (import <nixpkgs> { }).callPackage (builtins.getEnv "src") args;
+          drv = (import <nixpkgs> { }).callPackage (builtins.getEnv "callPackageSrc") args;
         in
         (drv.overrideAttrs or (attrs: drv // attrs)) {
           name = "${finalAttrs.passthru.outName}";
@@ -40,11 +41,9 @@ lib.extendMkDerivation {
 
       env = {
         NIX_PATH = "nixpkgs=${path}";
-      };
+      }
+      // env;
 
-      buildCommand = /* bash */ ''
-        drv=$(nix-instantiate - < "$callPackageExprPath")
-        install -Dm444 "$drv" "$out"
-      '';
+      dontUnpack = true;
     };
 }
