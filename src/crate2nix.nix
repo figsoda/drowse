@@ -60,7 +60,7 @@ lib.extendMkDerivation {
       crate2nixArgs = args'.value;
       crate2nixSelect = select;
 
-      instantiateExpr = /* nix */ ''
+      expr = /* nix */ ''
         let
           args = ${args'.load};
           project = import ./Cargo.nix args;

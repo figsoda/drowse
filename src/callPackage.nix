@@ -29,7 +29,7 @@ lib.extendMkDerivation {
       callPackageSrc = src;
       callPackageArgs = args'.value;
 
-      instantiateExpr = /* nix */ ''
+      expr = /* nix */ ''
         let
           args = ${args'.load};
           drv = (import <nixpkgs> { }).callPackage (builtins.getEnv "callPackageSrc") args;

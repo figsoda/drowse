@@ -7,9 +7,14 @@
 lib.extendMkDerivation {
   constructDrv = super.mkDynamicDerivation;
 
+  excludeDrvArgNames = [
+    "expr"
+  ];
+
   extendDrvArgs =
     finalAttrs:
     {
+      expr,
       nativeBuildInputs ? [ ],
       passAsFile ? [ ],
       ...
@@ -22,6 +27,7 @@ lib.extendMkDerivation {
       passAsFile = passAsFile ++ [
         "instantiateExpr"
       ];
+      instantiateExpr = expr;
 
       buildPhase = ''
         runHook preBuild
