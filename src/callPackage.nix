@@ -40,7 +40,7 @@ lib.extendMkDerivation {
       '';
 
       env = {
-        NIX_PATH = "nixpkgs=${path}";
+        NIX_PATH = "nixpkgs=${super.pathToString path}";
       }
       // env;
 
