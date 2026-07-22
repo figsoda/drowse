@@ -132,7 +132,7 @@ drowse.instantiate (finalAttrs: {
       version = "${finalAttrs.version}";
     }
   '';
-  env.NIX_PATH = "nixpkgs=${path}";
+  env.NIX_PATH = "nixpkgs=${toString path}";
   dontUnpack = true;
 })
 ```
@@ -147,7 +147,7 @@ drowse.mkDynamicDerivation {
   version = "0.3.3";
 
   nativeBuildInputs = [ nix ];
-  env.NIX_PATH = "nixpkgs=${path}";
+  env.NIX_PATH = "nixpkgs=${toString path}";
 
   buildCommand = ''
     drv=$(nix-instantiate --expr "(import <nixpkgs> { }).nix-init")
