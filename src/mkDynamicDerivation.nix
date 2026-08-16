@@ -7,10 +7,6 @@
 lib.extendMkDerivation {
   constructDrv = stdenvNoCC.mkDerivation;
 
-  excludeDrvArgNames = [
-    "meta"
-  ];
-
   extendDrvArgs =
     finalAttrs: args:
 
@@ -37,10 +33,7 @@ lib.extendMkDerivation {
       outputHashAlgo = "sha256";
       outputHashMode = "text";
       requiredSystemFeatures = [ "recursive-nix" ];
-      passthru = {
-        outName = name;
-        outMeta = args.meta or { };
-      };
+      passthru.outName = name;
     };
 
   transformDrv =
@@ -48,10 +41,12 @@ lib.extendMkDerivation {
     let
       args = {
         passthru = { inherit drv; };
-        meta = drv.outMeta;
       }
       // lib.optionalAttrs (drv ? pname && drv ? version) {
         inherit (drv) pname version;
+      }
+      // lib.optionalAttrs (drv ? meta) {
+        inherit (drv) meta;
       };
     in
     runCommand drv.outName args ''
