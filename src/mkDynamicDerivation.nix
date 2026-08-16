@@ -44,6 +44,9 @@ lib.extendMkDerivation {
       }
       // lib.optionalAttrs (drv ? pname && drv ? version) {
         inherit (drv) pname version;
+      }
+      // lib.optionalAttrs (drv ? meta) {
+        inherit (drv) meta;
       };
     in
     runCommand drv.outName args ''

@@ -9,6 +9,7 @@ let
     fetchFromGitHub
     git
     testers
+    writeText
     ;
 in
 
@@ -93,6 +94,18 @@ lib.fix (self: {
     assertion = "crate2nix and crate2nixDynamic are equivalent";
     expected = self.crate2nix;
     actual = self.crate2nixDynamic;
+  };
+
+  crate2nixMeta = drowse.crate2nix {
+    pname = "hello-rs-renamed";
+    version = "0.1.0";
+    src = ./hello-rs;
+    meta.mainProgram = "hello-rs";
+  };
+  crate2nixMetaForwarded = testers.testEqualContents {
+    assertion = "crate2nix forwards user-provided meta";
+    expected = writeText "expected-main-program" "hello-rs";
+    actual = writeText "actual-main-program" self.crate2nixMeta.meta.mainProgram;
   };
 
   crate2nixSelect = drowse.crate2nix {
