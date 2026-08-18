@@ -8,8 +8,8 @@ let
   inherit (pkgs)
     fetchFromGitHub
     git
+    runCommand
     testers
-    writeText
     ;
 in
 
@@ -102,11 +102,14 @@ lib.fix (self: {
     src = ./hello-rs;
     meta.mainProgram = "hello-rs";
   };
-  crate2nixMetaForwarded = testers.testEqualContents {
-    assertion = "crate2nix forwards user-provided meta";
-    expected = writeText "expected-main-program" "hello-rs";
-    actual = writeText "actual-main-program" self.crate2nixMeta.meta.mainProgram;
-  };
+  crate2nixMetaForwarded = runCommand "crate2nix-meta-test" { } ''
+    (
+      set -x
+      [[ "${self.crate2nixMeta.meta.mainProgram}" = hello-rs ]]
+      [[ "${self.crate2nixMeta.meta.position}" = "${toString ./default.nix}":* ]]
+    )
+    touch $out
+  '';
 
   crate2nixSelect = drowse.crate2nix {
     pname = "hello-rs";
