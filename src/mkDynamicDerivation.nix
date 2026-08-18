@@ -33,7 +33,10 @@ lib.extendMkDerivation {
       outputHashAlgo = "sha256";
       outputHashMode = "text";
       requiredSystemFeatures = [ "recursive-nix" ];
-      passthru.outName = name;
+      passthru = {
+        outName = name;
+        outPos = builtins.unsafeGetAttrPos (if args ? version then "version" else "name") args;
+      };
     };
 
   transformDrv =
@@ -41,6 +44,7 @@ lib.extendMkDerivation {
     let
       args = {
         passthru = { inherit drv; };
+        pos = drv.outPos;
       }
       // lib.optionalAttrs (drv ? pname && drv ? version) {
         inherit (drv) pname version;
